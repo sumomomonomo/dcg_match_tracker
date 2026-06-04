@@ -1,0 +1,110 @@
+doctype html
+html(lang="ja")
+  head
+    meta(charset="UTF-8")
+    script(src="https://cdn.jsdelivr.net/npm/chart.js")
+
+    link(
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    )
+
+    link(
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css"
+    )
+
+    title DCG Match Tracker
+
+  body.bg-light
+
+    nav.navbar.navbar-dark.bg-primary.mb-4
+      .container
+        span.navbar-brand
+          i.bi-bar-chart-fill.me-2
+          | DCG Match Tracker
+
+    .container
+
+      .d-flex.justify-content-between.align-items-center.mb-3
+        h2.mb-0 分析
+
+        a.btn.btn-outline-secondary(href="/")
+          i.bi-house.me-1
+          | ホームへ
+
+      .card.shadow-sm.mb-4
+        .card-body
+
+          form(method="GET" action="/analysis" class="d-flex align-items-center gap-2")
+
+            label.form-label.mb-0 表示
+
+            select.form-select.w-auto(name="mode" id="mode")
+
+              option(value="ALL" selected=(mode === "ALL")) 総合
+              option(value="FIRST" selected=(mode === "FIRST")) 先攻
+              option(value="SECOND" selected=(mode === "SECOND")) 後攻
+
+            button.btn.btn-primary(type="submit")
+              i.bi-arrow-repeat.me-1
+              | 更新
+
+      .card.shadow-sm.mb-4
+        .card-body
+
+          h5.card-title デッキ別統計
+
+          .table-responsive
+            table.table.table-striped.table-hover.align-middle
+              thead
+                tr
+                  th デッキ名
+                  th 使用回数
+                  th 勝利数
+                  th 勝率
+
+              tbody
+                each stat in stats
+                  tr
+                    td
+                      a.text-decoration-none(href=`/analysis/decks/${stat.deckId}`)
+                        = stat.deckName
+
+                    td= stat.totalMatches
+                    td= stat.winCount
+                    td= stat.winRate + "%"
+
+      .card.shadow-sm
+        .card-body
+
+          h5.card-title 勝率グラフ
+
+          canvas#winRateChart(width="800" height="300")
+
+    script.
+      const labels = !{JSON.stringify(chartLabels)};
+      const winRates = !{JSON.stringify(chartWinRates)};
+
+      new Chart(
+        document.getElementById('winRateChart'),
+        {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: '勝率 (%)',
+              data: winRates
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100
+              }
+            }
+          }
+        }
+      );

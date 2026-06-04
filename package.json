@@ -6,6 +6,14 @@
     "dev": "node src/app.js"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "@prisma/client": "^6.19.3",
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "express-session": "^1.19.0",
+    "prisma": "^6.19.3",
+    "pug": "^3.0.4"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

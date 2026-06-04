@@ -1,0 +1,128 @@
+doctype html
+html(lang="ja")
+  head
+    meta(charset="UTF-8")
+
+    link(
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    )
+
+    link(
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css"
+    )
+
+    title 戦績一覧
+
+  body.bg-light
+
+    nav.navbar.navbar-dark.bg-primary.mb-4
+      .container
+        span.navbar-brand
+          i.bi-list-check.me-2
+          | 戦績一覧
+
+    .container
+
+      .d-flex.justify-content-between.align-items-center.mb-3
+        h2.mb-0 戦績一覧
+
+        a.btn.btn-primary(href="/matches/new")
+          i.bi-plus-lg.me-1
+          | 新規登録
+
+      a.btn.btn-outline-secondary.mb-3(href="/")
+        i.bi-house.me-1
+        | トップへ
+
+      .card.shadow-sm.mb-4
+        .card-body
+
+          form(method="GET" action="/matches")
+            .row.g-3
+
+              .col-md-3
+                label.form-label 自分のデッキ
+                select.form-select(name="myDeckId")
+                  option(value="") 全て
+                  each deck in decks
+                    option(
+                      value=deck.id
+                      selected=(filters.myDeckId == deck.id)
+                    )= deck.name
+
+              .col-md-2
+                label.form-label 勝敗
+                select.form-select(name="isWin")
+                  option(value="") 全て
+                  option(value="true" selected=(filters.isWin === "true")) 勝ち
+                  option(value="false" selected=(filters.isWin === "false")) 負け
+
+              .col-md-2
+                label.form-label 先攻後攻
+                select.form-select(name="playOrder")
+                  option(value="") 全て
+                  option(value="FIRST" selected=(filters.playOrder === "FIRST")) 先攻
+                  option(value="SECOND" selected=(filters.playOrder === "SECOND")) 後攻
+
+              .col-md-3
+                label.form-label 相手デッキ
+                input.form-control(type="text" name="enemyDeckName" value=filters.enemyDeckName || "")
+
+              .col-md-2.d-flex.align-items-end
+                button.btn.btn-primary.w-100(type="submit")
+                  i.bi-search.me-1
+                  | 検索
+
+      .d-flex.justify-content-end.mb-3
+        a.btn.btn-outline-secondary(href="/matches")
+          | リセット
+
+      .card.shadow-sm
+        .card-body
+
+          if matches.length === 0
+            p.text-muted まだ戦績がありません
+          else
+            ul.list-group
+              each match in matches
+                li.list-group-item
+
+                  .d-flex.justify-content-between.align-items-start
+
+                    div
+                      if match.isWin
+                        span.text-success.fw-bold 勝ち
+                      else
+                        span.text-danger.fw-bold 負け
+
+                      span.ms-2
+                        | 自分: #{match.myDeck.name}
+
+                      span.ms-2
+                        | 相手: #{match.enemyDeckName}
+
+                      span.ms-2.text-muted
+                        | #{match.playOrder === "FIRST" ? "先攻" : "後攻"}
+                      
+                      if match.memo
+                        .mt-1
+                          small.text-muted
+                            i.bi-chat-left-text.me-1
+                            | #{match.memo}
+
+                    .d-flex.gap-2
+                      a.btn.btn-sm.btn-outline-primary.me-2(
+                        href=`/matches/${match.id}/edit`
+                      )
+                        i.bi-pencil.me-1
+                        | 編集
+
+                      form(method="POST" action=`/matches/${match.id}/delete`)
+                        button.btn.btn-sm.btn-outline-danger(
+                          type="submit"
+                          onclick="return confirm('この戦績を削除する？')"
+                        )
+                          i.bi-trash.me-1
+                          | 削除
