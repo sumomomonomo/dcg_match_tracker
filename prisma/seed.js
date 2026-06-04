@@ -1,8 +1,7 @@
 'use strict';
 
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
-
+const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 
 async function main() {
